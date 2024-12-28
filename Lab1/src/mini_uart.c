@@ -32,3 +32,28 @@ void uart_init ( void )
     *AUX_MU_CNTL_REG = 3;   // Enable receiver and transmitter
 }
 
+char uart_recv ( void )
+{
+    // wait until the UART has received something, check bit 0 of AUX_MU_LSR_REG
+    while(1) {
+        if(*AUX_MU_LSR_REG & 0x01) break;
+    }
+    return (char)(*AUX_MU_IO_REG);
+}
+
+void uart_send ( char c )
+{
+    // wait until the UART is ready to transmit, check bit 5 of AUX_MU_LSR_REG
+    while(1) {
+        if(*AUX_MU_LSR_REG & 0x20) break;
+    }
+    *AUX_MU_IO_REG = c;
+}
+
+void uart_send_string(char* str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        uart_send((char)str[i]);
+    }
+}

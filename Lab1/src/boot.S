@@ -7,7 +7,7 @@ _start:
     mrs    x0, mpidr_el1       // Load processor id from Multi-Processor ID Register
     and    x0, x0,#0xFF        // Check processor id
     cbz    x0, master          // Hang for all non-primary CPU
-    b    proc_hang
+    b      proc_hang
 
 proc_hang:
     wfe // Wait for event
@@ -19,8 +19,8 @@ master:
     sub    x1, x1, x0
     bl     memzero
 
-    mov    sp, #LOW_MEMORY
-    bl    kernel_main
+    mov    sp, #0x40000000
+    bl     main
 
 .align 4
 memzero:

@@ -5,8 +5,10 @@ SECTIONS
     .text : { *(.text) }
     .rodata : { *(.rodata) }
     .data : { *(.data) }
-    . = ALIGN(0x8);
-    bss_begin = .;
-    .bss : { *(.bss*) } 
-    bss_end = .;
+    .bss : {
+        . = ALIGN(16);
+        bss_begin = .;
+        *(.bss*)
+        bss_end = .;
+    }
 }
