@@ -33,14 +33,16 @@ void mailbox_call(int channel, unsigned int msg_addr)
     // Transfer 64 bit message address to 4 lower bit channel + 28 upper bit  address
     unsigned int msg = (msg_addr & ~0xF) | channel;
 
+    while(*MAILBOX_STATUS & MAILBOX_FULL); // wait until mailbox is not full
+    *MAILBOX_WRITE = msg; // write the message to mailbox
+
+    while(*MAILBOX_STATUS & MAILBOX_EMPTY); // wait until mailbox is not empty
+
     while(1)
     {
-        while(*MAILBOX_STATUS & MAILBOX_FULL); // wait until mailbox is not full
-        *MAILBOX_WRITE = msg; // write the message to mailbox
-
-        while(*MAILBOX_STATUS & MAILBOX_EMPTY); // wait until mailbox is not empty
-        while(*MAILBOX_READ != msg); // wait until the MAILBOX_READ message address is the same as previous message
-    }
+        if(*MAILBOX_READ == msg)
+            return;
+    } 
 }
 
 
