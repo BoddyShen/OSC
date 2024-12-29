@@ -6,7 +6,7 @@
 CMDS cmd_list[CMDS_LIST_LEN] = {
     {"help", "print all available commands", do_help},
     {"hello", "print Hello World!", do_hello},
-    {"info", "get board info", do_info}
+    {"info", "get board and ARM memory info", do_info}
 };
 
 char buffer[BUFFER_SIZE];
@@ -88,4 +88,5 @@ void do_hello ( void )
 void do_info ( void )
 {
     get_board_revision();
+    get_ARM_memory();
 }

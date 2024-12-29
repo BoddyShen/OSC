@@ -87,10 +87,10 @@ void get_ARM_memory(){
 
   mailbox_call(MAILBOX_CHANNEL_ARM_TO_VC, (unsigned int)((unsigned long)&mailbox));
   if (mailbox[1] == REQUEST_SUCCEED) {
-        uart_send_string("ARM base address: ");
+        uart_send_string("ARM Memory Base Address: ");
         uart_2hex(mailbox[5]);
         uart_send_string("\r\n");
-        uart_send_string("size: ");
+        uart_send_string("ARM Memory size: ");
         uart_2hex(mailbox[6]);
         uart_send_string("\r\n");
     } else {
