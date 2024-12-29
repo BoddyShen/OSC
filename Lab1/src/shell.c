@@ -1,10 +1,12 @@
 #include "mini_uart.h"
 #include "shell.h"
 #include "utils.h"
+#include "mailbox.h"
 
 CMDS cmd_list[CMDS_LIST_LEN] = {
     {"help", "print all available commands", do_help},
     {"hello", "print Hello World!", do_hello},
+    {"info", "get board info", do_info}
 };
 
 char buffer[BUFFER_SIZE];
@@ -50,6 +52,23 @@ void cmd_clean( void )
     }
 }
 
+void cmd_exec ( void )
+{
+    for (int i = 0; i < CMDS_LIST_LEN; i++)
+    {
+        if (strcmp(buffer, cmd_list[i].command) == 0)
+        {
+            if (cmd_list[i].func != NULL) {
+                cmd_list[i].func();
+            } else {
+                uart_send_string("Error: Command exists but has no function.\r\n");
+            }
+            return;
+        }
+    }
+    uart_send_string("Command not found, type help for available commands\r\n");
+}
+
 void do_help ( void )
 {
     for (int i = 0; i < CMDS_LIST_LEN; i++)
@@ -66,19 +85,7 @@ void do_hello ( void )
     uart_send_string("Hello World!\r\n");
 }
 
-void cmd_exec ( void )
+void do_info ( void )
 {
-    for (int i = 0; i < CMDS_LIST_LEN; i++)
-    {
-        if (strcmp(buffer, cmd_list[i].command) == 0)
-        {
-            if (cmd_list[i].func != NULL) {
-                cmd_list[i].func();
-            } else {
-                uart_send_string("Error: Command exists but has no function.\r\n");
-            }
-            return;
-        }
-    }
-    uart_send_string("Command not found, type help for available commands\r\n");
+    get_board_revision();
 }

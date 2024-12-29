@@ -20,6 +20,8 @@ void cmd_clean ( void);
 
 void do_help ( void );
 void do_hello ( void );
+void do_info ( void );
+
 void cmd_exec ( void);
 
 #endif  /*_SHELL_H */

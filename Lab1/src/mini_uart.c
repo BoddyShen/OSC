@@ -57,3 +57,13 @@ void uart_send_string(char* str)
         uart_send((char)str[i]);
     }
 }
+
+void uart_2hex(unsigned int d) {
+    unsigned int n;
+    int c;
+    for(c = 28; c >= 0; c -= 4) {
+        n = (d >> c) & 0xF;  // Extract 4 bits (nibbles), from the highest to the lowest
+        n += n > 9 ? 0x37 : 0x30;  // Convert the number to an ASCII character
+        uart_send(n);
+    }
+}

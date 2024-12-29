@@ -1,0 +1,67 @@
+#include "mailbox.h"
+#include "mini_uart.h"
+
+#include "rpi3_peripherals/base.h"
+
+// https://jsandler18.github.io/extra/mailbox.html
+// https://github.com/raspberrypi/firmware/wiki/Mailboxes
+// https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
+
+
+#define MAILBOX_BASE    PBASE + 0xb880
+
+#define MAILBOX_READ    ((volatile unsigned int*)(MAILBOX_BASE + 0x00))
+#define MAILBOX_STATUS  ((volatile unsigned int*)(MAILBOX_BASE + 0x18))
+#define MAILBOX_WRITE   ((volatile unsigned int*)(MAILBOX_BASE + 0x20))
+
+#define MAILBOX_EMPTY   0x40000000
+#define MAILBOX_FULL    0x80000000
+
+#define MAILBOX_CHANNEL_ARM_TO_VC  8
+#define MAILBOX_CHANNEL_VC_TO_ARM  9
+
+#define GET_BOARD_REVISION  0x00010002
+#define REQUEST_CODE        0x00000000
+#define REQUEST_SUCCEED     0x80000000
+#define REQUEST_FAILED      0x80000001
+#define TAG_REQUEST_CODE    0x00000000
+#define END_TAG             0x00000000
+
+// https://jsandler18.github.io/extra/mailbox.html
+void mailbox_call(int channel, unsigned int msg_addr)
+{
+    // Transfer 64 bit message address to 4 lower bit channel + 28 upper bit  address
+    unsigned int msg = (msg_addr & ~0xF) | channel;
+
+    while(1)
+    {
+        while(*MAILBOX_STATUS & MAILBOX_FULL); // wait until mailbox is not full
+        *MAILBOX_WRITE = msg; // write the message to mailbox
+
+        while(*MAILBOX_STATUS & MAILBOX_EMPTY); // wait until mailbox is not empty
+        while(*MAILBOX_READ != msg); // wait until the MAILBOX_READ message address is the same as previous message
+    }
+}
+
+
+void get_board_revision(){
+  unsigned int mailbox[7];
+  mailbox[0] = 7 * 4; // buffer size in bytes
+  mailbox[1] = REQUEST_CODE;
+  // tags begin
+  mailbox[2] = GET_BOARD_REVISION; // tag identifier
+  mailbox[3] = 4; // maximum of request and response value buffer's length.
+  mailbox[4] = TAG_REQUEST_CODE;
+  mailbox[5] = 0; // return value buffer
+  // tags end
+  mailbox[6] = END_TAG; // 4 bytes * 6 = 24 = 0x18
+
+  mailbox_call(MAILBOX_CHANNEL_ARM_TO_VC, (unsigned int)((unsigned long)&mailbox));
+  if (mailbox[1] == REQUEST_SUCCEED) {
+        uart_send_string("Board revision: ");
+        uart_2hex(mailbox[5]); //it should be 0xa020d3 for rpi3 b+
+        uart_send_string("\r\n");
+    } else {
+        uart_send_string("Failed to get board revision.\r\n");
+    } 
+}
