@@ -1,7 +1,7 @@
 ARMGNU ?= aarch64-linux-gnu
 
-COPS = -Wall -nostdlib -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
-ASMOPS = -Iinclude 
+COPS = -Wall -nostdlib -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only -g -O0
+ASMOPS = -Iinclude -g -O0
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -33,8 +33,13 @@ run:
 run_docker:
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio -display vnc=:0
 
+run_docker_debug:
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio -display vnc=:0 -S -gdb tcp::1234
+
 clean :
-	rm -rf $(BUILD_DIR) *.img 
+	rm -rf $(BUILD_DIR) *.img
+
+ 
 
 # llvm, something wrong with this way
 # all : kernel8.img
