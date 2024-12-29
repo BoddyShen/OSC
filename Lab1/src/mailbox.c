@@ -45,7 +45,7 @@ void mailbox_call(int channel, unsigned int msg_addr)
 
 
 void get_board_revision(){
-  unsigned int mailbox[7];
+  volatile unsigned int __attribute__((aligned(16))) mailbox[64];
   mailbox[0] = 7 * 4; // buffer size in bytes
   mailbox[1] = REQUEST_CODE;
   // tags begin
