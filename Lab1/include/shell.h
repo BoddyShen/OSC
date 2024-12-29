@@ -13,6 +13,7 @@ typedef struct CMDS
     void (*func)(void);
 } CMDS;
 
+int strcmp(const char *str1, const char *str2);
 
 void cmd_read ( void);
 void cmd_clean ( void);

@@ -1,5 +1,6 @@
 #include "mini_uart.h"
 #include "shell.h"
+#include "utils.h"
 
 CMDS cmd_list[CMDS_LIST_LEN] = {
     {"help", "print all available commands", do_help},
@@ -31,6 +32,13 @@ void cmd_read( void )
         }
         buffer[i++] = c;
         uart_send(c);
+
+        if (i >= BUFFER_SIZE - 1) { // buffer full
+            buffer[i] = '\0';
+            uart_send_string("\r\nBuffer full, try shorter command!\r\n");
+            cmd_clean();
+            return;
+        }
     }
 }
 
@@ -64,7 +72,11 @@ void cmd_exec ( void )
     {
         if (strcmp(buffer, cmd_list[i].command) == 0)
         {
-            cmd_list[i].func();
+            if (cmd_list[i].func != NULL) {
+                cmd_list[i].func();
+            } else {
+                uart_send_string("Error: Command exists but has no function.\r\n");
+            }
             return;
         }
     }
