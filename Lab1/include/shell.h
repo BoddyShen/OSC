@@ -1,7 +1,7 @@
 #ifndef	_SHELL_H
 #define	_SHELL_H
 
-#define CMDS_LIST_LEN 2
+#define CMDS_LIST_LEN 3
 #define CMDS_NAME_LEN 16
 #define CMDS_HELP_LEN 128
 #define BUFFER_SIZE 128 
