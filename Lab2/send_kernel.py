@@ -1,6 +1,8 @@
 import serial
 from pwn import p64
 
+# Run send_kernel.py in localhost to send kernel8.img to rpi3 when the bootloader is running
+
 kernel_path = "kernel8.img"
 ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
 
@@ -31,7 +33,7 @@ with open(kernel_path, 'rb') as f:
         ser.flush()
         read_ack()
     
-    ser.write(b'\x00') # end of transmission
+    ser.write(b'\x00') # footer, end of transmission
     print("Kernel sent.")
 
 ser.close()

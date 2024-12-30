@@ -6,7 +6,7 @@ ASMOPS = -Iinclude -g -O0
 BUILD_DIR = build
 SRC_DIR = src
 
-all : kernel8.img
+all : bootloader.img
 
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
@@ -23,45 +23,21 @@ OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
-kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
-	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
-	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
+bootloader.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
+	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/bootloader.elf  $(OBJ_FILES)
+	$(ARMGNU)-objcopy $(BUILD_DIR)/bootloader.elf -O binary bootloader.img
 
 run:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio
 
 run_docker:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio -display vnc=:0
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio -display vnc=:0
+
+run_docker_pty:
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial pty -serial stdio -display vnc=:0
 
 run_docker_debug:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio -display vnc=:0 -S -gdb tcp::1234
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio -display vnc=:0 -S -gdb tcp::1234
 
 clean :
 	rm -rf $(BUILD_DIR) *.img
-
- 
-
-# llvm, something wrong with this way
-# all : kernel8.img
-
-# clean :
-# 	rm -rf $(BUILD_DIR) *.img 
-
-# $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
-# 	mkdir -p $(@D)
-# 	clang $(COPS) --target=aarch64-rpi3-elf -mcpu=cortex-a53 -fuse-ld=lld -MMD -c $< -o $@
-
-# $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
-# 	clang $(ASMOPS) --target=aarch64-rpi3-elf -mcpu=cortex-a53 -fuse-ld=lld -MMD -c $< -o $@
-
-# C_FILES = $(wildcard $(SRC_DIR)/*.c)
-# ASM_FILES = $(wildcard $(SRC_DIR)/*.S)
-# OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-# OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
-
-# DEP_FILES = $(OBJ_FILES:%.o=%.d)
-# -include $(DEP_FILES)
-
-# kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
-# 	ld.lld -m aarch64elf -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
-# 	llvm-objcopy -O binary $(BUILD_DIR)/kernel8.elf kernel8.img
