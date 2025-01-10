@@ -1,10 +1,15 @@
 import serial
+import argparse
 from pwn import p64
+import os
 
-# Run send_kernel.py in localhost to send kernel8.img to rpi3 when the bootloader is running
+# Run send_kernel.py in localhost to send kernel8.img to rpi3 when the bootload>
 
-kernel_path = "kernel8.img"
-ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+kernel_path = os.path.join(os.path.dirname(__file__), 'kernel', 'kernel8.img')
+parser = argparse.ArgumentParser()
+parser.add_argument('--device', metavar='TTY',default='/dev/ttyUSB0', type=str,  help='path to UART device')
+args = parser.parse_args()
+ser = serial.Serial(args.device, 115200, timeout=3)
 
 def read_ack():
     ack = ser.read(1)
@@ -24,16 +29,17 @@ with open(kernel_path, 'rb') as f:
 
     # send kernel size, default small endian
     ser.write(p64(kernel_size))
+    ser.flush()
     read_ack()
+    print("Kernel size sent.")
 
-    # send kernel by block
-    block_size = 256
-    for i in range(0, kernel_size, block_size):
-        ser.write(kernel[i:i+block_size])
+    for i in range(kernel_size):
+        ser.write(kernel[i:i+1])
         ser.flush()
-        read_ack()
-    
-    ser.write(b'\x00') # footer, end of transmission
-    print("Kernel sent.")
+
+    print("Kernel sent")
+    ser.write(b'\xFF') # footer, end of transmission
+    read_ack()
+    print("Receive ACK.")
 
 ser.close()

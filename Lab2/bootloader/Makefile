@@ -30,6 +30,9 @@ bootloader.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
 run:
 	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio
 
+run_pty:
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial pty
+
 run_docker:
 	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio -display vnc=:0
 
