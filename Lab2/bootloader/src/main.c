@@ -1,5 +1,4 @@
 #include "mini_uart.h"
-#include "shell.h"
 #include "bootloader.h"
 
 void main(void)

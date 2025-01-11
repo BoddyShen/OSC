@@ -28,18 +28,20 @@ with open(kernel_path, 'rb') as f:
     print(f"Kernel size: {kernel_size}")
 
     # send kernel size, default small endian
-    ser.write(p64(kernel_size))
-    ser.flush()
+    for i in range(8):
+        ser.write(p64(kernel_size)[i:i+1])
+        ser.flush()
     read_ack()
     print("Kernel size sent.")
+
 
     for i in range(kernel_size):
         ser.write(kernel[i:i+1])
         ser.flush()
 
     print("Kernel sent")
-    ser.write(b'\xFF') # footer, end of transmission
-    read_ack()
-    print("Receive ACK.")
+    # ser.write(b'\xFF') # footer, end of transmission
+    # read_ack()
+    # print("Receive ACK.")
 
 ser.close()

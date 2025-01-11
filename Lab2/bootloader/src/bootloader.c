@@ -1,9 +1,10 @@
 #include "mini_uart.h"
 
-#define KERNEL_LOAD_ADDR  0x60000
 #define ACK  0x06  // Define ACK (0x06 indicates acknowledgment)
 #define START_TAG 0x1B
 #define END_TAG 0xFF  // Define END_TAG (0xFF indicates end of transmission)
+
+extern char _kernel_start_addr[];
 
 void send_ack() {
     uart_send(ACK);
@@ -13,7 +14,7 @@ void send_ack() {
 void load_kernel()
 {
     unsigned int kernel_size = 0;
-    char *kernel = (char *)KERNEL_LOAD_ADDR;
+    char *kernel = (char *)(&_kernel_start_addr);
 
     // Wait for header (0x1B)
     while (uart_recv() != START_TAG);
@@ -31,9 +32,9 @@ void load_kernel()
     }
 
     // Wait for end-of-transmission marker (0x00)
-     while (uart_recv() != END_TAG);
-     send_ack();
+    // while (uart_recv() != END_TAG);
+    // send_ack();
 
     // Jump to kernel address and start execution
-    ((void (*)())KERNEL_LOAD_ADDR)();
+    ((void (*)())_kernel_start_addr)();
 }
