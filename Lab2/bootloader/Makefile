@@ -31,15 +31,15 @@ run:
 	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio
 
 run_pty:
-	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial pty
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial pty 
 
-run_docker:
+run_lima:
 	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio -display vnc=:0
 
-run_docker_pty:
-	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial pty -serial stdio -display vnc=:0
+run_lima_pty:
+	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial pty -serial stdio -display vnc=:0 -initrd ../cpio_files/initramfs.cpio
 
-run_docker_debug:
+run_lima_debug:
 	qemu-system-aarch64 -M raspi3b -kernel bootloader.img -serial null -serial stdio -display vnc=:0 -S -gdb tcp::1234
 
 clean :

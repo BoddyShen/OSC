@@ -1,7 +1,7 @@
 #ifndef	_SHELL_H
 #define	_SHELL_H
 
-#define CMDS_LIST_LEN 3
+#define CMDS_LIST_LEN 4
 #define CMDS_NAME_LEN 16
 #define CMDS_HELP_LEN 128
 #define BUFFER_SIZE 128 
@@ -21,6 +21,7 @@ void cmd_clean ( void);
 void do_help ( void );
 void do_hello ( void );
 void do_info ( void );
+void do_ls ( void );
 
 void cmd_exec ( void);
 

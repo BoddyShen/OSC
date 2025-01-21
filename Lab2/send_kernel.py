@@ -3,7 +3,7 @@ import argparse
 from pwn import p64
 import os
 
-# Run send_kernel.py in localhost to send kernel8.img to rpi3 when the bootload>
+# Run send_kernel.py in localhost to send kernel8.img to Raspberry Pi when bootloader is up.
 
 kernel_path = os.path.join(os.path.dirname(__file__), 'kernel', 'kernel8.img')
 parser = argparse.ArgumentParser()
