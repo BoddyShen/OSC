@@ -7,7 +7,8 @@
 CMDS cmd_list[CMDS_LIST_LEN] = {{"help", "print all available commands", do_help},
                                 {"hello", "print Hello World!", do_hello},
                                 {"info", "get board and ARM memory info", do_info},
-                                {"ls", "list all files in the cpio archive", do_ls}};
+                                {"ls", "list all files in the cpio archive", do_ls},
+                                {"cat", "print the content of a file", do_cat}};
 
 char buffer[BUFFER_SIZE];
 
@@ -106,5 +107,33 @@ void do_ls(void)
         }
 
         cpio_curr_ptr = cpio_next_ptr;
+    }
+}
+
+void do_cat(void)
+{
+    char *cpio_path_name;
+    char *cpio_data;
+    struct cpio_newc_header *cpio_curr_ptr = CPIO_START_ADDR;
+    struct cpio_newc_header *cpio_next_ptr = cpio_curr_ptr;
+
+    while (1) {
+        int result = parse_cpio(cpio_curr_ptr, &cpio_next_ptr, &cpio_path_name, &cpio_data);
+
+        cpio_curr_ptr = cpio_next_ptr;
+        if (result == -1) {
+            uart_send_string("Error: Invalid cpio archive.\r\n");
+            return;
+        } else if (result == 1) {
+            // End of archive
+            return;
+        } else {
+            if (!strncmp(cpio_path_name, ".", sizeof("."))) continue;
+            uart_send_string("File: ");
+            uart_send_string(cpio_path_name);
+            uart_send_string("\r\n");
+            uart_send_string(cpio_data);
+            uart_send_string("\r\n");
+        }
     }
 }
