@@ -11,4 +11,10 @@ SECTIONS
         *(.bss*)
         bss_end = .;
     }
+    /* Allocate 0x10000 for heap.*/
+    .heap : {
+        _heap_top = .;     
+        . = . + 0x10000;   
+        _heap_bottom = .;  
+    }
 }

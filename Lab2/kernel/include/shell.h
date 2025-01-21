@@ -1,10 +1,12 @@
 #ifndef _SHELL_H
 #define _SHELL_H
 
-#define CMDS_LIST_LEN 5
+#define CMDS_LIST_LEN 6
 #define CMDS_NAME_LEN 16
 #define CMDS_HELP_LEN 128
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE   128
+
+#include "stddef.h"
 
 typedef struct CMDS {
     char command[CMDS_NAME_LEN];
@@ -22,6 +24,7 @@ void do_hello(void);
 void do_info(void);
 void do_ls(void);
 void do_cat(void);
+void do_malloc(void);
 
 void cmd_exec(void);
 

@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "cpio.h"
+#include "heap.h"
 #include "mailbox.h"
 #include "mini_uart.h"
 #include "utils.h"
@@ -8,7 +9,8 @@ CMDS cmd_list[CMDS_LIST_LEN] = {{"help", "print all available commands", do_help
                                 {"hello", "print Hello World!", do_hello},
                                 {"info", "get board and ARM memory info", do_info},
                                 {"ls", "list all files in the cpio archive", do_ls},
-                                {"cat", "print the content of a file", do_cat}};
+                                {"cat", "print the content of a file", do_cat},
+                                {"malloc", "allocate memory", do_malloc}};
 
 char buffer[BUFFER_SIZE];
 
@@ -136,4 +138,27 @@ void do_cat(void)
             uart_send_string("\r\n");
         }
     }
+}
+
+static void test_malloc(size_t size)
+{
+    uart_send_string("Test allocating ");
+    uart_2hex(size);
+    uart_send_string(" bytes memory...\r\n");
+    void *heap_ptr = simple_malloc(size);
+    if (heap_ptr == NULL) {
+        uart_send_string("Error: Out of memory.\r\n");
+    } else {
+        uart_send_string("Memory allocated at: ");
+        uart_2hex((unsigned long)heap_ptr);
+        uart_send_string("\r\n");
+    }
+}
+
+void do_malloc(void)
+{
+    test_malloc(0);
+    test_malloc(1);
+    test_malloc(8);
+    test_malloc(16);
 }
